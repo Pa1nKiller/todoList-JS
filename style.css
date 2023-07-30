@@ -1,0 +1,61 @@
+[class^="ico-"],
+[class*=" ico-"] {
+    font: normal 1em/1 Arial, sans-serif;
+    display: inline-block;
+}
+
+.ico-times::before {
+    color: #900;
+    content: "\2716";
+}
+
+.ico-check::before {
+    color: #090;
+    content: "\2714";
+}
+
+
+/*----*/
+body{
+    font-size: 1.5rem;
+}
+
+button{
+    font-size: 100%;
+    background-color: #6b9efe;
+    padding: .625rem;
+    border-radius: .3125rem;
+}
+
+.wrapper{
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+}
+
+li{
+    margin: .625rem;
+}
+
+.item-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: .625rem;
+}
+
+.active{
+    text-decoration: line-through;
+}
+.input{
+    border: .125rem solid #000;
+    padding: .3125rem;
+    width: 260px;
+    font-size: 1.5rem;
+    margin: 1.2rem;
+}
