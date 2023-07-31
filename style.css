@@ -14,6 +14,10 @@
     content: "\2714";
 }
 
+h2{
+    text-align: center;
+    font-size: 2rem;
+}
 
 /*----*/
 body{
@@ -25,16 +29,7 @@ button{
     background-color: #6b9efe;
     padding: .625rem;
     border-radius: .3125rem;
-}
-
-.wrapper{
-    height: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    flex-direction: column;
+    white-space: nowrap;
 }
 
 li{
@@ -52,10 +47,23 @@ li{
 .active{
     text-decoration: line-through;
 }
-.input{
+input{
+    width: 100%;
     border: .125rem solid #000;
     padding: .3125rem;
-    width: 260px;
     font-size: 1.5rem;
     margin: 1.2rem;
+}
+
+form{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;    
+    justify-content: center;
+}
+
+ul{
+    display: flex;
+    align-items: start;
+    flex-direction: column
 }
