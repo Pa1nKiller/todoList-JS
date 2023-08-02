@@ -52,7 +52,86 @@ for (const iterator of filterArray) {
 
 
 (function () {
-    function createButton(idName, ...classMames){
+    function dataToJson(data) {
+        return JSON.stringify(data);
+    }
+
+    function jsonToData(data) {
+        return JSON.parse(data);
+    }
+
+    function getTodoData() {
+        return localStorage.getItem('todoData');
+    }
+
+    function setTodoData(data) {
+        localStorage.setItem('todoData', data);
+    }
+
+    function addTodoData(data) {
+        let todoData = getTodoData();
+
+        todoData = todoData ? jsonToData(todoData) : [];
+
+        todoData.push(data);
+        setTodoData(dataToJson(todoData));
+    }
+
+    function removeFromTodo(todoData) {
+        let todoItems = jsonToData(getTodoData());
+        let newTodoItems = [];
+        for (let index = 0; index < todoItems.length; index++) {
+            if (todoItems[index].name != todoData) {
+                newTodoItems.push(todoItems[index])
+            }
+        }
+        setTodoData(dataToJson(newTodoItems));
+    }
+
+    function updateFromTodo(todoData){
+        let todoItems = jsonToData(getTodoData());
+        let newTodoItems = [];
+        for (let index = 0; index < todoItems.length; index++) {
+            if (todoItems[index].name == todoData) {
+                todoItems[index].state = todoItems[index].state == "nonActive" ? "active" : "nonActive";
+            }
+            newTodoItems.push(todoItems[index])
+        }
+        setTodoData(dataToJson(newTodoItems));
+    }
+
+    function printAllTodoList(todoList) {
+        let todoItems = jsonToData(getTodoData());
+
+        if (todoItems) {
+            for (const iterator of todoItems) {
+                let itemList = createTodoItem(iterator.name);
+                createEventsOnButton(itemList);
+                if (iterator.state == "active"){
+                    itemList.item.children[0].lastChild.classList.toggle('active');
+                }
+                todoList.append(itemList.item);
+            }
+        }
+    }
+
+    function createEventsOnButton(todoItem) {
+        todoItem.acc.addEventListener('click', function () {
+            todoItem.item.children[0].lastChild.classList.toggle('active');
+            updateFromTodo(todoItem.content);
+        });
+
+        todoItem.del.addEventListener('click', function () {
+            for (const iterator of jsonToData(getTodoData())) {
+                if (iterator.name == todoItem.content) {
+                    todoItem.item.remove();
+                    removeFromTodo(todoItem.content);
+                }
+            }
+        });
+    }
+
+    function createButton(idName, ...classMames) {
         let btn = document.createElement('button');
         btn.classList.toggle(classMames);
         btn.id = idName;
@@ -78,7 +157,7 @@ for (const iterator of filterArray) {
         form.append(input);
         form.append(buttonWrapper);
 
-        return{
+        return {
             form,
             input,
             button,
@@ -90,13 +169,13 @@ for (const iterator of filterArray) {
         return list;
     }
 
-    function createTodoItem(name){
+    function createTodoItem(content) {
         let item = document.createElement('li');
         let p = document.createElement('p');
         p.classList.toggle('item-content');
 
         let text = document.createElement('p');
-        text.textContent = name;
+        text.textContent = content;
 
         let del = createButton('btnDell', 'ico-times');
         let acc = createButton('btnAccept', 'ico-check');
@@ -110,13 +189,12 @@ for (const iterator of filterArray) {
             item,
             del,
             acc,
+            content,
         };
     }
 
-    document.addEventListener('DOMContentLoaded', function(){
+    document.addEventListener('DOMContentLoaded', function () {
         let container = document.getElementById('todo-app');
-        
-        console.log(container);
 
         let todoAppTitle = createAppTitle('Список дел');
         let todoItemForm = createTodoItemForm();
@@ -126,91 +204,23 @@ for (const iterator of filterArray) {
         container.append(todoItemForm.form);
         container.append(todoList);
 
-        todoItemForm.form.addEventListener('submit', function(e){
+        printAllTodoList(todoList);
+
+        todoItemForm.form.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            if(!todoItemForm.input.value){
+            if (!todoItemForm.input.value) {
                 return;
             }
 
             let todoItem = createTodoItem(todoItemForm.input.value);
-            
-            todoItem.acc.addEventListener('click', function(){
-                todoItem.item.children[0].lastChild.classList.toggle('active');
-            });
-            
-            todoItem.del.addEventListener('click', function(){
-                todoItem.item.remove();
-            });
+            addTodoData({name: todoItemForm.input.value, state: "nonActive"});
+            createEventsOnButton(todoItem);
+
+            console.log(todoItem);
 
             todoList.append(todoItem.item);
-
             todoItemForm.input.value = '';
         });
     });
 })();
-
-
-
-
-
-
-/*function printList(list, ul) {
-    ul.innerHTML = "";
-    for (let index = 0; index < list.length; index++) {
-        ul.appendChild(list[index]);
-    }
-}
-
-
-let list = [];
-let ul = document.querySelector('.list');
-
-let input = document.getElementById('input');
-
-let btnAdd = document.getElementById('btnAdd');
-let btnDell = document.getElementById('btnDell');
-let btnAccept = document.getElementById('btnAccept');
-
-btnAdd.addEventListener('click', function () {
-    if (input.value.length == 0) return;
-
-    let li = document.createElement('li');
-    let p = document.createElement('p');
-    p.classList.toggle('item-content');
-
-    let text = document.createElement('p');
-    text.textContent = input.value;
-    input.value = "";
-
-    let del = document.createElement('i');
-    del.classList.toggle('ico-times');
-    del.setAttribute("role", "img");
-    del.setAttribute("aria-label", "Cancel");
-    del.id = "btnDell";
-    del.addEventListener('click', function () {
-        list.splice(list.indexOf(this.parentNode.parentNode), 1);
-        printList(list, ul);
-    });
-
-    let acc = document.createElement('i');
-    acc.classList.toggle('ico-check');
-    acc.setAttribute("role", "img");
-    acc.setAttribute("aria-label", "Accept");
-    acc.id = "btnAccept";
-    acc.addEventListener('click', function () {
-        this.parentNode.lastChild.classList.toggle("active");
-        printList(list, ul);
-    });
-
-
-    p.appendChild(del);
-    p.appendChild(acc);
-    p.appendChild(text);
-
-    li.appendChild(p);
-
-    list.push(li);
-    printList(list, ul);
-});
-*/
